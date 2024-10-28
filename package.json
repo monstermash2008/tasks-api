@@ -4,8 +4,12 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "tsx watch src/index.ts",
+    "start": "node ./dist/src/index.js",
+    "typecheck": "tsc --noEmit",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "test": "cross-env NODE_ENV=test LOG_LEVEL=silent vitest",
+    "build": "tsc && tsc-alias"
   },
   "dependencies": {
     "@hono/node-server": "^1.13.2",
@@ -26,9 +30,13 @@
   "devDependencies": {
     "@antfu/eslint-config": "^3.8.0",
     "@types/node": "^20.11.17",
+    "cross-env": "^7.0.3",
     "drizzle-kit": "^0.26.2",
     "eslint": "^9.13.0",
     "eslint-plugin-format": "^0.1.2",
-    "tsx": "^4.7.1"
+    "tsc-alias": "^1.8.10",
+    "tsx": "^4.7.1",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.3"
   }
 }

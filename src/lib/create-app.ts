@@ -1,5 +1,3 @@
-import type { PinoLogger } from "hono-pino";
-
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { pinoLogger } from "hono-pino";
 import pino from "pino";
@@ -9,7 +7,7 @@ import { defaultHook } from "stoker/openapi";
 
 import env from "@/env";
 
-import type { AppBindings } from "./types";
+import type { AppBindings, AppOpenAPI } from "./types";
 
 export function createRouter() {
   return new OpenAPIHono<AppBindings>({
@@ -31,4 +29,10 @@ export default function createApp() {
   app.notFound(notFound);
   app.onError(onError);
   return app;
+}
+
+export function createTestApp(router: AppOpenAPI) {
+  const testApp = createApp();
+  testApp.route("/", router);
+  return testApp;
 }
