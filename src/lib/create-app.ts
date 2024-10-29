@@ -1,11 +1,9 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
-import { pinoLogger } from "hono-pino";
-import pino from "pino";
-import pretty from "pino-pretty";
 import { notFound, onError, serveEmojiFavicon } from "stoker/middlewares";
 import { defaultHook } from "stoker/openapi";
 
-import env from "@/env";
+import { parseEnv } from "@/env";
+import { pinoLogger } from "@/middlewares/pino-logger";
 
 import type { AppBindings, AppOpenAPI } from "./types";
 
@@ -18,21 +16,19 @@ export function createRouter() {
 
 export default function createApp() {
   const app = createRouter();
+  app.use((c, next) => {
+    // eslint-disable-next-line node/no-process-env
+    c.env = parseEnv(Object.assign(c.env || {}, process.env));
+    return next();
+  });
   app.use(serveEmojiFavicon("📝"));
-  app.use(pinoLogger({
-    pino: pino({ level: env.LOG_LEVEL || "info" }, env.NODE_ENV === "production" ? undefined : pretty()),
-    http: {
-      reqId: () => crypto.randomUUID(),
-    },
-  }));
+  app.use(pinoLogger());
 
   app.notFound(notFound);
   app.onError(onError);
   return app;
 }
 
-export function createTestApp(router: AppOpenAPI) {
-  const testApp = createApp();
-  testApp.route("/", router);
-  return testApp;
+export function createTestApp<R extends AppOpenAPI>(router: R) {
+  return createApp().route("/", router);
 }
